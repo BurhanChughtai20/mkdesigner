@@ -8,7 +8,8 @@ import { CardsData } from "./components/card/Card";
 import { Chart } from "./components/chart/chart";
 import { TrafficByWebsite } from "./components/TrafficByWebsite";
 import Table from "./components/table/page";
-import CampaignFormDialog from "@/components/CampaignFormDialog"; // path to dialog
+import CampaignFormDialog from "./components/campaign/CampaignFormDialog";
+// import CampaignFormDialog from "@/components/CampaignFormDialog";
 
 const headerTriggerClasses =
   "p-2 rounded-md bg-white/20 dark:bg-black/40 backdrop-blur-xl hover:bg-white/30 dark:hover:bg-black/50 transition-colors";
