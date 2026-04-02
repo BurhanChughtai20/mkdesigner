@@ -1,12 +1,14 @@
+"use client";
 
+import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { FileText, Menu } from "lucide-react";
 import { CardsData } from "./components/card/Card";
 import { Chart } from "./components/chart/chart";
 import { TrafficByWebsite } from "./components/TrafficByWebsite";
-import { useEffect, useState } from "react";
 import Table from "./components/table/page";
+import CampaignFormDialog from "@/components/CampaignFormDialog"; // path to dialog
 
 const headerTriggerClasses =
   "p-2 rounded-md bg-white/20 dark:bg-black/40 backdrop-blur-xl hover:bg-white/30 dark:hover:bg-black/50 transition-colors";
@@ -134,7 +136,7 @@ function GlassButton({
             className="text-sm font-semibold tracking-wide relative z-10"
             style={{ color: t.text }}
           >
-            View All
+            Campaign Form
           </span>
         </div>
       </div>
@@ -144,6 +146,7 @@ function GlassButton({
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
+  const [isFormOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
     const check = () =>
@@ -182,7 +185,7 @@ export default function App() {
 
             <GlassButton
               isDark={isDark}
-              onClick={() => console.log("View All")}
+              onClick={() => setFormOpen(true)}
             />
           </div>
 
@@ -193,8 +196,14 @@ export default function App() {
             <TrafficByWebsite />
           </div>
 
-          <Table/>
+          <Table />
         </main>
+
+        {/* Campaign Form Dialog */}
+        <CampaignFormDialog
+          isOpen={isFormOpen}
+          onClose={() => setFormOpen(false)}
+        />
       </div>
     </SidebarProvider>
   );

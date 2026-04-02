@@ -1,0 +1,19 @@
+{
+  "step1": [
+    { "name": "clientName", "label": "Client Name", "type": "text", "placeholder": "Enter client name" },
+    { "name": "industry", "label": "Industry", "type": "text", "placeholder": "Enter industry" },
+    { "name": "website", "label": "Website", "type": "url", "placeholder": "https://example.com" },
+    { "name": "competitors", "label": "Key Competitors", "type": "text", "placeholder": "Enter competitors" }
+  ],
+  "step2": [
+    { "name": "objective", "label": "Campaign Objective", "type": "select", "options": ["Awareness", "Consideration", "Conversion"] },
+    { "name": "targetAudience", "label": "Target Audience", "type": "text", "placeholder": "Who are you targeting?" },
+    { "name": "budget", "label": "Budget", "type": "number", "placeholder": "Campaign budget in USD" }
+  ],
+  "step3": [
+    { "name": "tone", "label": "Tone", "type": "text", "placeholder": "E.g., professional, fun" },
+    { "name": "imagery", "label": "Imagery Style", "type": "text", "placeholder": "Photography, illustration, etc." },
+    { "name": "colorDirection", "label": "Color Direction", "type": "text", "placeholder": "Brand colors or mood" },
+    { "name": "dosAndDonts", "label": "Do's & Don'ts", "type": "textarea", "placeholder": "Any important guidance?" }
+  ]
+}

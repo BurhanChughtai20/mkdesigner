@@ -27,6 +27,8 @@ body {
 }
 
 
+
+
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: 'Geist Variable', sans-serif;
@@ -149,4 +151,29 @@ body {
   html {
     @apply font-sans;
     }
+}
+
+/* Tailwind-compatible 3D input */
+.input-3d {
+  @apply border rounded-lg p-2 bg-gray-50 dark:bg-zinc-900;
+
+  /* 3D effect */
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1),
+              inset -2px -2px 5px rgba(255,255,255,0.7);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.input-3d:focus {
+  @apply outline-none;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2),
+              inset -1px -1px 3px rgba(255,255,255,0.9);
+  transform: translateY(-1px);
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none;  /* Firefox */
 }
