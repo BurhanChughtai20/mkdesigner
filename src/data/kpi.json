@@ -1,0 +1,58 @@
+{
+  "cardsDataJSON": [
+    {
+      "id": "impressions",
+      "label": "Impressions",
+      "value": "4,280,000",
+      "change": "+12.4%",
+      "trend": "up",
+      "icon": "Eye",
+      "description": "Total ad views this month"
+    },
+    {
+      "id": "clicks",
+      "label": "Clicks",
+      "value": "187,340",
+      "change": "+8.1%",
+      "trend": "up",
+      "icon": "MousePointerClick",
+      "description": "Users who clicked your ads"
+    },
+    {
+      "id": "ctr",
+      "label": "CTR",
+      "value": "4.38%",
+      "change": "-0.6%",
+      "trend": "down",
+      "icon": "Percent",
+      "description": "Click-through rate"
+    },
+    {
+      "id": "conversions",
+      "label": "Conversions",
+      "value": "9,821",
+      "change": "+19.3%",
+      "trend": "up",
+      "icon": "ShoppingCart",
+      "description": "Completed target actions"
+    },
+    {
+      "id": "spend",
+      "label": "Spend",
+      "value": "$48,200",
+      "change": "+5.2%",
+      "trend": "up",
+      "icon": "DollarSign",
+      "description": "Total ad budget used"
+    },
+    {
+      "id": "roas",
+      "label": "ROAS",
+      "value": "6.2x",
+      "change": "+1.4x",
+      "trend": "up",
+      "icon": "TrendingUp",
+      "description": "Return on ad spend"
+    }
+  ]
+}

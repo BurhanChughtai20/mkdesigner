@@ -1,0 +1,81 @@
+{
+  "dateRange": {
+    "presets": [
+      {
+        "label": "Last 7d",
+        "days": 7
+      },
+      {
+        "label": "Last 30d",
+        "days": 30
+      },
+      {
+        "label": "Last 90d",
+        "days": 90
+      },
+      {
+        "label": "Custom",
+        "days": null
+      }
+    ],
+    "default": "Last 30d"
+  },
+  "campaigns": [
+    {
+      "id": "c001",
+      "name": "Lumiere Summer Launch",
+      "client": "Lumiere Skincare",
+      "status": "active",
+      "budget": 50000,
+      "spend": 32450,
+      "impressions": 2400000,
+      "clicks": 48000,
+      "conversions": 1200,
+      "startDate": "2026-03-01",
+      "endDate": "2026-06-30",
+      "lastUpdated": "2026-04-02"
+    },
+    {
+      "id": "c002",
+      "name": "Winter Glow Campaign",
+      "client": "Glow Cosmetics",
+      "status": "paused",
+      "budget": 35000,
+      "spend": 18700,
+      "impressions": 1450000,
+      "clicks": 27500,
+      "conversions": 740,
+      "startDate": "2026-02-15",
+      "endDate": "2026-05-15",
+      "lastUpdated": "2026-04-01"
+    },
+    {
+      "id": "c003",
+      "name": "Spring Refresh",
+      "client": "FreshSkin Labs",
+      "status": "completed",
+      "budget": 60000,
+      "spend": 59800,
+      "impressions": 3200000,
+      "clicks": 62000,
+      "conversions": 1800,
+      "startDate": "2026-01-01",
+      "endDate": "2026-03-31",
+      "lastUpdated": "2026-03-31"
+    },
+    {
+      "id": "c004",
+      "name": "New Product Awareness",
+      "client": "Pure Essence",
+      "status": "draft",
+      "budget": 20000,
+      "spend": 0,
+      "impressions": 0,
+      "clicks": 0,
+      "conversions": 0,
+      "startDate": "2026-04-05",
+      "endDate": "2026-07-05",
+      "lastUpdated": "2026-04-02"
+    }
+  ]
+}

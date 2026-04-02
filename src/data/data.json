@@ -1,0 +1,36 @@
+{
+  "brand": {
+    "name": "AdFlow",
+    "icon": "LayoutDashboard"
+  },
+  "groups": [
+    {
+      "id": "clients",
+      "label": "Clients",
+      "items": [
+        { "id": "c1", "label": "Nike Inc.", "icon": "Users", "href": "/clients/nike" },
+        { "id": "c2", "label": "Coca-Cola", "icon": "Users", "href": "/clients/coca-cola" },
+        { "id": "c3", "label": "Apple Media", "icon": "Users", "href": "/clients/apple" },
+        { "id": "c4", "label": "Samsung Ads", "icon": "Users", "href": "/clients/samsung" }
+      ]
+    },
+    {
+      "id": "campaigns",
+      "label": "Campaigns",
+      "items": [
+        { "id": "cp1", "label": "Summer Launch", "icon": "Megaphone", "href": "/campaigns/summer-launch" },
+        { "id": "cp2", "label": "Q4 Retargeting", "icon": "Megaphone", "href": "/campaigns/q4-retargeting" },
+        { "id": "cp3", "label": "Brand Awareness", "icon": "Megaphone", "href": "/campaigns/brand-awareness" }
+      ]
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "items": [
+        { "id": "s1", "label": "Account", "icon": "Settings", "href": "/settings/account" },
+        { "id": "s2", "label": "Integrations", "icon": "Settings", "href": "/settings/integrations" },
+        { "id": "s3", "label": "Billing", "icon": "Settings", "href": "/settings/billing" }
+      ]
+    }
+  ]
+}
