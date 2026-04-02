@@ -25,6 +25,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { jsPDF } from "jspdf";
 
+/* ---------------- TYPES ---------------- */
+
 type StepField = {
   name: string;
   label: string;
@@ -39,82 +41,101 @@ type FormFieldsJson = {
   step3: StepField[];
 };
 
-const formFieldsJson: FormFieldsJson = rawFormFieldsJson as FormFieldsJson;
+/* ---------------- SCHEMA ---------------- */
 
 const formSchema = z.object({
-  clientName: z.string().min(2, "Client Name is required"),
-  industry: z.string().min(2, "Industry is required"),
-  website: z.string().url("Website must be a valid URL"),
-  competitors: z.string().min(1, "Competitors are required"),
+  clientName: z.string().min(2),
+  industry: z.string().min(2),
+  website: z.string().url(),
+  competitors: z.string().min(1),
   objective: z.enum(["Awareness", "Consideration", "Conversion"]),
-  targetAudience: z.string().min(2, "Target Audience is required"),
-  budget: z
-    .number()
-    .min(1, "Budget must be greater than 0")
-    .refine((val) => !isNaN(val), "Budget must be a valid number"),
-  tone: z.string().min(2, "Tone is required"),
-  imagery: z.string().min(2, "Imagery style is required"),
-  colorDirection: z.string().min(2, "Color direction is required"),
-  dosAndDonts: z.string().min(1, "Please provide guidance"),
+  targetAudience: z.string().min(2),
+  budget: z.coerce.number().min(1, "Budget must be at least 1"),
+  tone: z.string().min(2),
+  imagery: z.string().min(2),
+  colorDirection: z.string().min(2),
+  dosAndDonts: z.string().min(1),
 });
 
+type FormInput  = z.input<typeof formSchema>;
+type FormOutput = z.output<typeof formSchema>;
 
-type FormData = z.infer<typeof formSchema>;
+const formFieldsJson = rawFormFieldsJson as FormFieldsJson;
 
-const isSelectField = (field: StepField): field is StepField & { options: string[] } =>
-  field.type === "select" && Array.isArray(field.options);
+/* ---------------- COMPONENT ---------------- */
 
-interface CampaignFormDialogProps {
+export default function CampaignFormDialog({
+  isOpen,
+  onClose,
+}: {
   isOpen: boolean;
   onClose: () => void;
-}
-
-export default function CampaignFormDialog({ isOpen, onClose }: CampaignFormDialogProps) {
+}) {
   const [step, setStep] = useState(1);
   const [aiOutput, setAiOutput] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
 
   const {
-    handleSubmit,
-    control,
-    watch,
-    trigger,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    mode: "onBlur",
-    defaultValues: { objective: "Awareness" },
-  });
+  handleSubmit,
+  control,
+  trigger,
+  watch,
+  formState: { errors },
+} = useForm<FormInput, unknown, FormOutput>({
+  resolver: zodResolver(formSchema),
+  mode: "onBlur",
+  defaultValues: {
+    clientName: "",
+    industry: "",
+    website: "",
+    competitors: "",
+    objective: "Awareness",
+    targetAudience: "",
+    budget: undefined,
+    tone: "",
+    imagery: "",
+    colorDirection: "",
+    dosAndDonts: "",
+  },
+});
 
-  const currentStepFields = useMemo(() => formFieldsJson[`step${step}` as keyof FormFieldsJson], [step]);
+  /* ---------------- HELPERS ---------------- */
+
+  const currentFields = useMemo(
+    () => formFieldsJson[`step${step}` as keyof FormFieldsJson],
+    [step]
+  );
 
   const nextStep = useCallback(async () => {
-    const valid = await trigger(currentStepFields.map((f) => f.name as keyof FormData));
-    if (valid) setStep((prev) => prev + 1);
-  }, [trigger, currentStepFields]);
+    const fieldNames = currentFields.map((f) => f.name as keyof FormInput);
+    const valid = await trigger(fieldNames);
+    if (valid) setStep((s) => s + 1);
+  }, [trigger, currentFields]);
 
-  const prevStep = useCallback(() => setStep((prev) => prev - 1), []);
+  const prevStep = useCallback(() => setStep((s) => s - 1), []);
 
-  const onSubmit = useCallback(
-    async (data: FormData) => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/ai-campaign", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const result: Record<string, unknown> = await response.json();
-        setAiOutput(result);
-        setStep(5);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  /* ---------------- SUBMIT ---------------- */
+
+  // onSubmit now correctly receives FormOutput — budget is `number` here
+  const onSubmit = useCallback(async (data: FormOutput) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ai-campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      setAiOutput(result);
+      setStep(5);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /* ---------------- PDF ---------------- */
 
   const exportPDF = useCallback(() => {
     if (!aiOutput) return;
@@ -123,25 +144,86 @@ export default function CampaignFormDialog({ isOpen, onClose }: CampaignFormDial
     doc.save("campaign.pdf");
   }, [aiOutput]);
 
-  const renderStep = useCallback(() => {
+  /* ---------------- RENDER FIELD ---------------- */
+
+  const renderField = useCallback(
+    (field: StepField) => (
+      <div key={field.name}>
+        <Label className="mb-1">{field.label}</Label>
+
+        <Controller
+          name={field.name as keyof FormInput}
+          control={control}
+          render={({ field: ctrl }) => {
+            // String() cast is safe here — FormInput fields are strings or unknown,
+            // and the HTML just needs a string to display.
+            const displayValue = ctrl.value !== undefined ? String(ctrl.value) : "";
+
+            if (field.type === "textarea") {
+              return (
+                <Textarea
+                  placeholder={field.placeholder}
+                  className="input-3d"
+                  value={displayValue}
+                  onChange={(e) => ctrl.onChange(e.target.value)}
+                />
+              );
+            }
+
+            if (field.type === "select" && field.options) {
+              return (
+                <Select value={displayValue} onValueChange={ctrl.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {field.options.map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              );
+            }
+
+            return (
+              <Input
+                placeholder={field.placeholder}
+                className="input-3d"
+                type={field.type}
+                value={displayValue}
+                onChange={(e) => ctrl.onChange(e.target.value)}
+              />
+            );
+          }}
+        />
+
+        {errors[field.name as keyof FormInput] && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors[field.name as keyof FormInput]?.message as string}
+          </p>
+        )}
+      </div>
+    ),
+    [control, errors]
+  );
+
+  /* ---------------- RENDER ---------------- */
+
+  const renderStep = () => {
     const data = watch();
 
     if (step === 4) {
       return (
-        <div className="space-y-4 max-h-96 overflow-y-auto scrollbar-hidden">
-          <h3 className="font-bold text-xl mb-2">Review Your Inputs</h3>
-          {Object.entries(data).map(([key, value]) => (
-            <div
-              key={key}
-              className="p-3 border rounded-lg shadow-md bg-gray-50 dark:bg-zinc-900 flex justify-between items-center hover:scale-[1.01] transition-transform"
-            >
-              <div className="font-semibold text-gray-700 dark:text-gray-200">{key}</div>
-              <div className="text-gray-900 dark:text-gray-100">{value ?? <em>Not Provided</em>}</div>
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          <h3 className="font-bold text-lg">Review</h3>
+          {Object.entries(data).map(([k, v]) => (
+            <div key={k} className="flex justify-between border p-2 rounded">
+              <span className="font-medium">{k}</span>
+              <span>{v !== undefined ? String(v) : <em>Not provided</em>}</span>
             </div>
           ))}
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            If any information is incorrect, use the "Back" button to edit.
-          </p>
         </div>
       );
     }
@@ -149,80 +231,40 @@ export default function CampaignFormDialog({ isOpen, onClose }: CampaignFormDial
     if (step === 5 && aiOutput) {
       return (
         <div className="space-y-4">
-          <h3 className="font-bold text-lg">AI Campaign Suggestions</h3>
-          <pre className="bg-gray-100 dark:bg-zinc-800 p-4 rounded scrollbar-hidden">
+          <pre className="bg-gray-100 p-3 rounded text-sm">
             {JSON.stringify(aiOutput, null, 2)}
           </pre>
-          <Button onClick={exportPDF}>Export as PDF</Button>
+          <Button onClick={exportPDF}>Export PDF</Button>
         </div>
       );
     }
 
-    return (
-      <div className="space-y-4">
-        {currentStepFields.map((field) => (
-          <div key={field.name}>
-            <Label className="mb-1">{field.label}</Label>
-            <Controller
-              name={field.name as keyof FormData}
-              control={control}
-              render={({ field: { value, onChange } }) => {
-                if (field.type === "textarea") {
-                  return <Textarea placeholder={field.placeholder} value={value as string} onChange={(e) => onChange(e.target.value)} className="input-3d" />;
-                }
+    return <div className="space-y-4">{currentFields.map(renderField)}</div>;
+  };
 
-                if (isSelectField(field)) {
-                  return (
-                    <Select value={(value as string) ?? "Awareness"} onValueChange={onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={field.placeholder} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {field.options.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  );
-                }
-
-                return (
-                  <Input
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    value={value !== undefined ? String(value) : ""}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    className="input-3d"
-                  />
-                );
-              }}
-            />
-            {errors[field.name as keyof FormData] && (
-              <p className="text-red-500 text-sm mt-1">{errors[field.name as keyof FormData]?.message}</p>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }, [step, aiOutput, currentStepFields, control, errors, watch, exportPDF]);
+  /* ---------------- UI ---------------- */
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Campaign Brief Builder</DialogTitle>
+          <DialogTitle>Campaign Builder</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>{renderStep()}</form>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {renderStep()}
+        </form>
 
-        <DialogFooter className="flex justify-between mt-4">
-          {step > 1 && step <= 4 && <Button variant="outline" onClick={prevStep}>Back</Button>}
+        <DialogFooter className="flex justify-between">
+          {step > 1 && step <= 4 && (
+            <Button variant="outline" onClick={prevStep}>
+              Back
+            </Button>
+          )}
           {step < 4 && <Button onClick={nextStep}>Next</Button>}
           {step === 4 && (
             <Button onClick={handleSubmit(onSubmit)} disabled={loading}>
-              {loading ? "Sending..." : "Submit"}
+              {loading ? "Processing..." : "Submit"}
             </Button>
           )}
           {step === 5 && <Button onClick={onClose}>Close</Button>}
