@@ -3,163 +3,118 @@
 import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { FileText, Menu } from "lucide-react";
+import { FileText, Menu, Sun, Moon } from "lucide-react";
 import { CardsData } from "./components/card/Card";
 import { Chart } from "./components/chart/chart";
 import { TrafficByWebsite } from "./components/TrafficByWebsite";
 import Table from "./components/table/page";
 import CampaignFormDialog from "./components/campaign/CampaignFormDialog";
-// import CampaignFormDialog from "@/components/CampaignFormDialog";
 
+// Trigger classes
 const headerTriggerClasses =
   "p-2 rounded-md bg-white/20 dark:bg-black/40 backdrop-blur-xl hover:bg-white/30 dark:hover:bg-black/50 transition-colors";
 const mdTriggerClasses =
   "p-2 rounded-md bg-white/20 dark:bg-black/40 backdrop-blur-xl hover:bg-white/30 dark:hover:bg-black/50 transition-colors";
 
-const btnTheme = {
+// Glassy button styles
+const themes = {
   dark: {
-    borderGradient:
-      "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 35%, transparent 100%)",
-    bodyBg:
-      "linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 55%, rgba(0,0,0,0.22) 100%)",
-    boxShadow: `
-      0 0 0 1px rgba(255,255,255,0.07),
-      0 2px 6px rgba(0,0,0,0.35),
-      0 8px 24px rgba(0,0,0,0.40),
-      inset 0 1px 0 rgba(255,255,255,0.16),
-      inset 1px 0 0 rgba(255,255,255,0.07)
-    `,
-    boxShadowHover: `
-      0 0 0 1px rgba(255,255,255,0.12),
-      0 4px 12px rgba(0,0,0,0.45),
-      0 16px 40px rgba(0,0,0,0.50),
-      inset 0 1px 0 rgba(255,255,255,0.22),
-      inset 1px 0 0 rgba(255,255,255,0.10)
-    `,
-    topStreak:
-      "linear-gradient(90deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.10) 45%, transparent 100%)",
-    cornerGlare:
-      "radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%)",
-    backdropFilter: "blur(24px) saturate(180%)",
+    bg: "linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.22) 100%)",
+    shadow: "0 2px 6px rgba(0,0,0,0.35)",
     text: "rgba(255,255,255,0.85)",
     icon: "rgba(255,255,255,0.65)",
   },
   light: {
-    borderGradient:
-      "linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(220,215,255,0.65) 40%, rgba(180,170,240,0.18) 100%)",
-    bodyBg:
-      "linear-gradient(160deg, rgba(255,255,255,0.60) 0%, rgba(238,236,255,0.58) 50%, rgba(210,205,255,0.38) 100%)",
-    boxShadow: `
-      0 0 0 1px rgba(139,120,255,0.18),
-      0 2px 6px rgba(100,80,200,0.12),
-      0 8px 24px rgba(80,60,180,0.16),
-      inset 0 1.5px 0 rgba(255,255,255,1),
-      inset 1px 0 0 rgba(255,255,255,0.85)
-    `,
-    boxShadowHover: `
-      0 0 0 1px rgba(139,120,255,0.28),
-      0 4px 12px rgba(100,80,200,0.20),
-      0 16px 36px rgba(80,60,180,0.22),
-      inset 0 1.5px 0 rgba(255,255,255,1),
-      inset 1px 0 0 rgba(255,255,255,0.90)
-    `,
-    topStreak:
-      "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.70) 40%, transparent 100%)",
-    cornerGlare:
-      "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.5) 35%, transparent 70%)",
-    backdropFilter: "blur(28px) saturate(200%) brightness(1.04)",
+    bg: "linear-gradient(160deg, rgba(255,255,255,0.6) 0%, rgba(238,236,255,0.58) 50%)",
+    shadow: "0 2px 6px rgba(100,80,200,0.12)",
     text: "rgba(5,2,20,0.88)",
-    icon: "rgba(10,5,30,0.60)",
+    icon: "rgba(10,5,30,0.6)",
   },
 };
 
-function GlassButton({
-  isDark,
-  onClick,
-}: {
-  isDark: boolean;
-  onClick?: () => void;
-}) {
-  const t = isDark ? btnTheme.dark : btnTheme.light;
+// GlassButton component (already in your code)
+function GlassButton({ isDark, onClick }: { isDark: boolean; onClick?: () => void }) {
   const [hovered, setHovered] = useState(false);
+  const t = isDark ? themes.dark : themes.light;
 
   return (
-    <div style={{ perspective: "800px" }}>
+    <div
+      className="relative rounded-xl p-px cursor-pointer select-none"
+      style={{
+        transform: hovered ? "translateY(-2px)" : "translateY(0px)",
+        transition: "transform 0.3s ease",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+    >
       <div
-        className="relative rounded-xl p-px overflow-hidden cursor-pointer select-none"
+        className="relative flex items-center gap-2 px-4 py-2 rounded-xl"
         style={{
-          transform: hovered
-            ? "rotateX(0deg) rotateY(0deg) translateY(-2px)"
-            : "rotateX(1.5deg) rotateY(-1deg)",
-          transformStyle: "preserve-3d",
-          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+          background: t.bg,
+          boxShadow: t.shadow,
+          color: t.text,
         }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onClick={onClick}
       >
-        <div
-          className="absolute inset-0 rounded-xl pointer-events-none z-0"
-          style={{ background: t.borderGradient }}
-        />
+        <FileText className="w-4 h-4" style={{ color: t.icon }} />
+        <span className="text-sm font-semibold">Campaign Form</span>
+      </div>
+    </div>
+  );
+}
+// ThemeToggle component
+function ThemeToggle() {
+  // Initialize state directly based on document class
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+  const [hovered, setHovered] = useState(false);
 
-        <div
-          className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl"
-          style={{
-            background: t.bodyBg,
-            backdropFilter: t.backdropFilter,
-            WebkitBackdropFilter: t.backdropFilter,
-            boxShadow: hovered ? t.boxShadowHover : t.boxShadow,
-            transition: "background 0.3s ease, box-shadow 0.3s ease",
-          }}
-        >
-          <div
-            className="absolute top-0 left-0 right-0 h-px pointer-events-none rounded-t-xl"
-            style={{ background: t.topStreak }}
-          />
+  // Optional: observe changes if something else toggles dark mode outside this component
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
 
-          <div
-            className="absolute top-1 left-2 w-8 h-8 pointer-events-none rounded-full"
-            style={{ background: t.cornerGlare, filter: "blur(6px)" }}
-          />
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
-          <FileText
-            className="w-4 h-4 shrink-0 relative z-10"
-            style={{
-              color: t.icon,
-              filter: isDark
-                ? "drop-shadow(0 0 4px rgba(255,255,255,0.2))"
-                : "drop-shadow(0 0 4px rgba(100,80,200,0.25))",
-            }}
-          />
+  const toggleTheme = () => {
+    document.documentElement.classList.toggle("dark");
+    setIsDark(document.documentElement.classList.contains("dark")); // read DOM directly
+  };
 
-          <span
-            className="text-sm font-semibold tracking-wide relative z-10"
-            style={{ color: t.text }}
-          >
-            Campaign Form
-          </span>
-        </div>
+  const t = isDark ? themes.dark : themes.light;
+
+  return (
+    <div
+      className="relative rounded-xl p-px cursor-pointer select-none"
+      style={{
+        transform: hovered ? "translateY(-2px)" : "translateY(0px)",
+        transition: "transform 0.3s ease",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={toggleTheme}
+    >
+      <div
+        className="flex items-center justify-center w-10 h-10 rounded-xl"
+        style={{
+          background: t.bg,
+          boxShadow: t.shadow,
+          color: t.icon,
+        }}
+      >
+        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </div>
     </div>
   );
 }
 
+// Main App Component
 export default function App() {
-  const [isDark, setIsDark] = useState(false);
   const [isFormOpen, setFormOpen] = useState(false);
-
-  useEffect(() => {
-    const check = () =>
-      setIsDark(document.documentElement.classList.contains("dark"));
-    check();
-    const obs = new MutationObserver(check);
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => obs.disconnect();
-  }, []);
 
   return (
     <SidebarProvider>
@@ -171,11 +126,12 @@ export default function App() {
             <Menu className="w-4 h-4" />
           </SidebarTrigger>
           <span className="font-semibold text-sm tracking-tight">AdFlow</span>
-          <div className="w-9" />
+          <ThemeToggle />
         </header>
 
-        <div className="hidden md:flex items-center px-3 py-2 border-b">
+        <div className="hidden md:flex items-center px-3 py-2 border-b justify-between">
           <SidebarTrigger className={mdTriggerClasses} />
+          <ThemeToggle />
         </div>
 
         <main className="flex-1 p-4 md:p-6">
@@ -184,10 +140,7 @@ export default function App() {
               Overview
             </h2>
 
-            <GlassButton
-              isDark={isDark}
-              onClick={() => setFormOpen(true)}
-            />
+            <GlassButton onClick={() => setFormOpen(true)} isDark={document.documentElement.classList.contains("dark")} />
           </div>
 
           <CardsData />
@@ -200,7 +153,6 @@ export default function App() {
           <Table />
         </main>
 
-        {/* Campaign Form Dialog */}
         <CampaignFormDialog
           isOpen={isFormOpen}
           onClose={() => setFormOpen(false)}
